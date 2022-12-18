@@ -1,10 +1,15 @@
 package com.example;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public abstract class Base {
     private Socket connection;
@@ -82,16 +87,18 @@ public abstract class Base {
         this.serverIp = serverIp;
         try {
             connect();
-            String[] dataArray = this.bufferedReader.readLine().trim().split(" ");
-            this.gridHeight = Integer.parseInt(dataArray[0]);
-            this.gridWidth = Integer.parseInt(dataArray[1]);
-            this.character = dataArray[2].charAt(0);
-            this.id = Integer.parseInt(dataArray[3]);
-            this.score = Integer.parseInt(dataArray[4]);
-            this.maxTurnCount = Integer.parseInt(dataArray[5]);
-            this.agentCount = Integer.parseInt(dataArray[6]);
-            this.agentScores = new int[agentCount];
-            this.printWriter.println("CONFIRM");
+            String data = this.bufferedReader.readLine();
+            Map<String, Object> result = new ObjectMapper().readValue(data, HashMap.class);
+            System.out.println(result);
+//            this.gridHeight = Integer.parseInt(dataArray[0]);
+//            this.gridWidth = Integer.parseInt(dataArray[1]);
+//            this.character = dataArray[2].charAt(0);
+//            this.id = Integer.parseInt(dataArray[3]);
+//            this.score = Integer.parseInt(dataArray[4]);
+//            this.maxTurnCount = Integer.parseInt(dataArray[5]);
+//            this.agentCount = Integer.parseInt(dataArray[6]);
+//            this.agentScores = new int[agentCount];
+//            this.printWriter.println("CONFIRM");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,6 +122,7 @@ public abstract class Base {
         Action(String command) {
             this.command = command;
         }
+
     }
 
     private void parseTurnData(String data) {
