@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -22,6 +23,7 @@ public abstract class Base {
     private char character;
     private int[] agentScores;
     private String[][] grid;
+    private LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>> probabilities;
 
     public static String DEFAULT_SERVER_IP = "127.0.0.1";
     public static int DEFAULT_SERVER_PORT = 9921;
@@ -70,6 +72,15 @@ public abstract class Base {
         return grid;
     }
 
+    public LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>> getProbabilities() {
+        return probabilities;
+    }
+
+    public void setProbabilities(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>> probabilities) {
+        this.probabilities = probabilities;
+    }
+
+
     public Base() {
         this(DEFAULT_SERVER_IP, DEFAULT_SERVER_PORT);
     }
@@ -90,15 +101,18 @@ public abstract class Base {
             String data = this.bufferedReader.readLine();
             Map<String, Object> result = new ObjectMapper().readValue(data, HashMap.class);
             System.out.println(result);
-//            this.gridHeight = Integer.parseInt(dataArray[0]);
-//            this.gridWidth = Integer.parseInt(dataArray[1]);
-//            this.character = dataArray[2].charAt(0);
-//            this.id = Integer.parseInt(dataArray[3]);
-//            this.score = Integer.parseInt(dataArray[4]);
-//            this.maxTurnCount = Integer.parseInt(dataArray[5]);
-//            this.agentCount = Integer.parseInt(dataArray[6]);
-//            this.agentScores = new int[agentCount];
-//            this.printWriter.println("CONFIRM");
+
+            this.gridHeight = (Integer) result.get("height");
+            this.gridWidth = (Integer) result.get("width");
+            this.character = ((String) result.get("character")).charAt(0);
+            this.id = (Integer) result.get("id");
+            this.score = (Integer) result.get("score");
+            this.maxTurnCount = (Integer) result.get("max_turn_count");
+            this.agentCount = (Integer) result.get("agent_count");
+            this.agentScores = new int[agentCount];
+            this.probabilities = (LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>>) result.get("probabilities");
+            this.printWriter.println("CONFIRM");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
