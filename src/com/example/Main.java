@@ -1,10 +1,7 @@
 package com.example;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 
 public class Main extends Base {
@@ -62,6 +59,7 @@ public class Main extends Base {
                 chosenDiamond.setPassedTurnsToFollow(chosenDiamond.getPassedTurnsToFollow() + 1);
             }
         }
+        updateCurrentPosition();
         return decideAction(currentPositionI, currentPositionJ);
     }
 
@@ -259,16 +257,29 @@ public class Main extends Base {
         }
     }
 
+    public void updateCurrentPosition() {
+        String[][] map = getGrid();
+        try {
+            for (int i = 0; i < getGridHeight(); i++) {
+                for (int j = 0; j < getGridWidth(); j++) {
+                    if (map[i][j].equals("A")) {
+                        currentPositionI = i;
+                        currentPositionJ = j;
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
     class SecondThread extends Thread {
         public void run() {
             if (getTurnCount() > 1) {
                 scoredGrid = new int[getGridHeight()][getGridWidth()];
             }
             chooseDiamond(map);
-
-//            if (chooseDiamond(map) == null) {
-//                chooseDiamondWide(map);
-//            }
         }
 
         public House chooseDiamond(String[][] map) {
@@ -286,31 +297,6 @@ public class Main extends Base {
 
                             scoredGrid = new int[getGridHeight()][getGridWidth()];
                             for (int tmp = 0; tmp <= distance + 5; tmp++) {
-                                setNeighborsScoreOfDiamond(chosenDiamond.getI(), chosenDiamond.getJ(), tmp);
-                            }
-                            return chosenDiamond;
-                        }
-                    }
-                }
-                return null;
-            } catch (Exception ex) {
-                return null;
-            }
-        }
-
-        public House chooseDiamondWide(String[][] map) {
-            try {
-                for (int i = getGridHeight() - 1; i >= 0; i--) {
-                    for (int j = getGridWidth() - 1; j >= 0; j--) {
-                        if (map[i][j].equals("1") || map[i][j].equals("2") || map[i][j].equals("3") || map[i][j].equals("4")) {
-                            chosenDiamond = new House();
-                            chosenDiamond.setI(i);
-                            chosenDiamond.setJ(j);
-                            System.out.println("\n++++++++New Diamond :" + i + " : " + j);
-                            chosenDiamond.setValue(map[i][j]);
-                            Long distance = getDistance(currentPositionI, currentPositionJ, chosenDiamond.getI(), chosenDiamond.getJ()) + 4;
-                            System.out.println("Distance : " + distance);
-                            for (int tmp = 0; tmp <= distance; tmp++) {
                                 setNeighborsScoreOfDiamond(chosenDiamond.getI(), chosenDiamond.getJ(), tmp);
                             }
                             return chosenDiamond;
