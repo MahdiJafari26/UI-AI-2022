@@ -33,16 +33,17 @@ public class Main extends Base {
 
     @Override
     public Action doTurn() {
-        System.out.println("------------------------------------");
-        System.out.println("---- We are at:" + currentPositionI + " : " + currentPositionJ);
+        map = getGrid();
         scoredGrid[currentPositionI][currentPositionJ] = scoredGrid[currentPositionI][currentPositionJ] / 4;
+        System.out.println("\t------------------------------------");
 
         if (getTurnCount() == 1) {
-            map = getGrid();
             new SecondThread().start();
             ownedKeys.put("g", false);
             ownedKeys.put("r", false);
             ownedKeys.put("y", false);
+        } else if (getTurnCount() == 2) {
+            scoredGrid[0][0] = scoredGrid[0][0] / 4;
         }
         for (int a = 0; a < getGridHeight(); a++) {
             for (int b = 0; b < getGridWidth(); b++) {
@@ -59,7 +60,14 @@ public class Main extends Base {
                 chosenDiamond.setPassedTurnsToFollow(chosenDiamond.getPassedTurnsToFollow() + 1);
             }
         }
-        updateCurrentPosition();
+        updatePosition();
+        updateKeys();
+        updateDiamondsArchive();
+        try {
+            Thread.sleep(600);
+        } catch (Exception ex) {
+
+        }
         return decideAction(currentPositionI, currentPositionJ);
     }
 
@@ -68,9 +76,35 @@ public class Main extends Base {
         client.play();
     }
 
+    public void updateDiamondsArchive() {
+
+    }
+
+    public void updateKeys() {
+        switch (map[currentPositionI][currentPositionJ]) {
+            case "r":
+                ownedKeys.put("r", true);
+                new SecondThread().start();
+
+                break;
+            case "g":
+                ownedKeys.put("g", true);
+                new SecondThread().start();
+
+                break;
+            case "y":
+                ownedKeys.put("y", true);
+                new SecondThread().start();
+
+                break;
+        }
+    }
+
     public Action decideAction(Integer i, Integer j) {
         House bestHouse = new House();
         int tmp = -1;
+        bestHouse.setScore(0);
+
         try {
             bestHouse.setScore(scoredGrid[i + 1][j + 1]);
             bestHouse.setAction(Action.DownRight);
@@ -147,38 +181,14 @@ public class Main extends Base {
         }
 
         try {
-            currentPositionI = bestHouse.getI();
-            currentPositionJ = bestHouse.getJ();
-//            scoredGrid[bestHouse.getI()][bestHouse.getJ()] = scoredGrid[bestHouse.getI()][bestHouse.getJ()] / 4;
             System.out.println(bestHouse.getAction() + " to: " + bestHouse.getI() + " : " + bestHouse.getJ() + " \n Score: " + bestHouse.score);
             if (bestHouse.getScore() == maxScoreOfGrid * 5) {
                 System.out.println("*************GOT THE DIAMOND\n");
-                map[bestHouse.getI()][bestHouse.getJ()] = "E";
                 chosenDiamond = null;
                 new SecondThread().start();
             }
-            if (bestHouse.getValue().equals("1") || bestHouse.getValue().equals("2") || bestHouse.getValue().equals("3") || bestHouse.getValue().equals("4")) {
-                map[bestHouse.getI()][bestHouse.getJ()] = "E";
-            }
 
             if (map[bestHouse.getI()][bestHouse.getJ()] != "W") {
-                switch (map[bestHouse.getI()][bestHouse.getJ()]) {
-                    case "r":
-                        ownedKeys.put("r", true);
-                        new SecondThread().start();
-
-                        break;
-                    case "g":
-                        ownedKeys.put("g", true);
-                        new SecondThread().start();
-
-                        break;
-                    case "y":
-                        ownedKeys.put("y", true);
-                        new SecondThread().start();
-
-                        break;
-                }
                 return bestHouse.getAction();
             } else {
                 return Action.NoOp;
@@ -206,6 +216,13 @@ public class Main extends Base {
         return false;
     }
 
+    public Boolean detectTeleport(int i, int j) {
+        if (map[i][j].equals("T")) {
+            return true;
+        }
+        return false;
+    }
+
     public void setNeighborsScoreOfDiamond(int i, int j, int distance) {
         try {
             scoredGrid[i][j] = maxScoreOfGrid * 5;
@@ -218,30 +235,23 @@ public class Main extends Base {
                         scoredGrid[a][b] = -(maxScoreOfGrid);
                     } else if (detectWire(a, b)) {
                         scoredGrid[a][b] = (maxScoreOfGrid) / 100;
+                    } else if (detectTeleport(a, b)) {
+                        scoredGrid[a][b] = (maxScoreOfGrid) / 10;
                     } else if (map[i][j].equals("R")) {
                         if (ownedKeys.get("r")) {
-                            map[i][j] = "E";
-                            if (scoredGrid[a][b] == 0) {
-                                scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
-                            }
+                            scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
                     } else if (map[i][j].equals("Y")) {
                         if (ownedKeys.get("y")) {
-                            map[i][j] = "E";
-                            if (scoredGrid[a][b] == 0) {
-                                scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
-                            }
+                            scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
                     } else if (map[i][j].equals("G")) {
                         if (ownedKeys.get("g")) {
-                            map[i][j] = "E";
-                            if (scoredGrid[a][b] == 0) {
-                                scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
-                            }
+                            scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
@@ -251,35 +261,36 @@ public class Main extends Base {
                         }
                     }
                 } catch (Exception ex) {
-                    // System.out.println(ex);
                 }
             }
         }
     }
 
-    public void updateCurrentPosition() {
-        String[][] map = getGrid();
+    public void updatePosition() {
         try {
             for (int i = 0; i < getGridHeight(); i++) {
                 for (int j = 0; j < getGridWidth(); j++) {
-                    if (map[i][j].equals("A")) {
+                    if (map[i][j].substring(1).equals("A")) {
                         currentPositionI = i;
                         currentPositionJ = j;
+                        System.out.println("---- We are at:" + currentPositionI + " : " + currentPositionJ);
+
                         return;
                     }
                 }
             }
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
         }
     }
+
 
     class SecondThread extends Thread {
         public void run() {
             if (getTurnCount() > 1) {
                 scoredGrid = new int[getGridHeight()][getGridWidth()];
             }
-            chooseDiamond(map);
+            chooseDiamond(getGrid());
         }
 
         public House chooseDiamond(String[][] map) {
@@ -290,10 +301,10 @@ public class Main extends Base {
                             chosenDiamond = new House();
                             chosenDiamond.setI(i);
                             chosenDiamond.setJ(j);
-                            System.out.println("\n++++++++New Diamond Wide:" + i + " : " + j);
                             chosenDiamond.setValue(map[i][j]);
                             Long distance = getDistance(currentPositionI, currentPositionJ, chosenDiamond.getI(), chosenDiamond.getJ()) + 4;
-                            System.out.println("Distance : " + distance);
+                            System.out.println("\n++++++++Found new diamond  at:" + i + " : " + j);
+//                            System.out.println("Distance : " + distance);
 
                             scoredGrid = new int[getGridHeight()][getGridWidth()];
                             for (int tmp = 0; tmp <= distance + 5; tmp++) {
