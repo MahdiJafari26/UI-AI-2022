@@ -44,9 +44,8 @@ public class Main extends Base {
             ownedKeys.put("g", false);
             ownedKeys.put("r", false);
             ownedKeys.put("y", false);
-        } else if (getTurnCount() == 2) {
-            scoredGrid[0][0] = scoredGrid[0][0] / 4;
         }
+
         for (int a = 0; a < getGridHeight(); a++) {
             for (int b = 0; b < getGridWidth(); b++) {
                 System.out.print("\t" + scoredGrid[a][b]);
@@ -79,10 +78,13 @@ public class Main extends Base {
     }
 
     public void updateDiamondsArchive() {
-        if (scoredGrid[currentPositionI][currentPositionJ] == maxScoreOfGrid * 5) {
-            System.out.println("*************GOT THE DIAMOND\n");
-            chosenDiamond = null;
-            new SecondThread().start();
+        try {
+            if (oldMap[currentPositionI][currentPositionJ].charAt(0) == '1' || oldMap[currentPositionI][currentPositionJ].charAt(0) == '2' || oldMap[currentPositionI][currentPositionJ].charAt(0) == '3' || oldMap[currentPositionI][currentPositionJ].charAt(0) == '4') {
+                System.out.println("*************GOT THE DIAMOND\n");
+                chosenDiamond = null;
+                new SecondThread().start();
+            }
+        } catch (Exception ex) {
         }
     }
 
@@ -102,7 +104,6 @@ public class Main extends Base {
                     new SecondThread().start();
                     break;
             }
-
         } catch (Exception e) {
         }
     }
@@ -145,7 +146,6 @@ public class Main extends Base {
                                 break;
                             case 4:
                                 bestHouse.setAction(Action.NoOp);
-                                new SecondThread().start();
                                 break;
                             case 5:
                                 bestHouse.setAction(Action.Right);
@@ -244,13 +244,13 @@ public class Main extends Base {
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
-                    } else if (map[b][b].charAt(0) == 'Y') {
+                    } else if (map[a][b].charAt(0) == 'Y') {
                         if (ownedKeys.get("y")) {
                             scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
-                    } else if (map[b][b].charAt(0) == 'G') {
+                    } else if (map[a][b].charAt(0) == 'G') {
                         if (ownedKeys.get("g")) {
                             scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
@@ -265,6 +265,8 @@ public class Main extends Base {
                 }
             }
         }
+        scoredGrid[0][0] = scoredGrid[0][0] / 4;
+
     }
 
     public void updatePosition() {
@@ -298,18 +300,18 @@ public class Main extends Base {
             try {
                 for (int i = 0; i < getGridHeight(); i++) {
                     for (int j = 0; j < getGridWidth(); j++) {
-                        if (map[i][j].equals("1") || map[i][j].equals("2") || map[i][j].equals("3") || map[i][j].equals("4")) {
+                        if (map[i][j].charAt(0) == '1' || map[i][j].charAt(0) == '2' || map[i][j].charAt(0) == '3' || map[i][j].charAt(0) == '4') {
                             chosenDiamond = new House();
                             chosenDiamond.setI(i);
                             chosenDiamond.setJ(j);
                             chosenDiamond.setValue(map[i][j]);
                             Long distance = getDistance(currentPositionI, currentPositionJ, chosenDiamond.getI(), chosenDiamond.getJ()) + 4;
-                            System.out.println("++++++++Found new diamond  at:" + i + " : " + j);
+                            System.out.println("++++++++Chose new diamond  at: " + i + " : " + j);
 //                            System.out.println("Distance : " + distance);
 
                             scoredGrid = new int[getGridHeight()][getGridWidth()];
-                            for (int tmp = 0; tmp <= distance + 5; tmp++) {
-                                setNeighborsScoreOfDiamond(chosenDiamond.getI(), chosenDiamond.getJ(), tmp);
+                            for (int diameter = 0; diameter <= distance + 5; diameter++) {
+                                setNeighborsScoreOfDiamond(chosenDiamond.getI(), chosenDiamond.getJ(), diameter);
                             }
                             return chosenDiamond;
                         }
