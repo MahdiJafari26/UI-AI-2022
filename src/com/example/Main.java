@@ -10,6 +10,7 @@ public class Main extends Base {
     int[][] scoredGrid = new int[getGridHeight()][getGridWidth()];
 
     public String[][] map;
+    public String[][] oldMap;
     public Integer currentPositionI = 0;
     public Integer currentPositionJ = 0;
     public Integer maxScoreOfGrid = 10000;
@@ -33,6 +34,7 @@ public class Main extends Base {
 
     @Override
     public Action doTurn() {
+        oldMap = map;
         map = getGrid();
         scoredGrid[currentPositionI][currentPositionJ] = scoredGrid[currentPositionI][currentPositionJ] / 4;
         System.out.println("\t------------------------------------");
@@ -77,26 +79,31 @@ public class Main extends Base {
     }
 
     public void updateDiamondsArchive() {
-
+        if (scoredGrid[currentPositionI][currentPositionJ] == maxScoreOfGrid * 5) {
+            System.out.println("*************GOT THE DIAMOND\n");
+            chosenDiamond = null;
+            new SecondThread().start();
+        }
     }
 
     public void updateKeys() {
-        switch (map[currentPositionI][currentPositionJ]) {
-            case "r":
-                ownedKeys.put("r", true);
-                new SecondThread().start();
+        try {
+            switch (oldMap[currentPositionI][currentPositionJ].charAt(0)) {
+                case 'r':
+                    ownedKeys.put("r", true);
+                    new SecondThread().start();
+                    break;
+                case 'g':
+                    ownedKeys.put("g", true);
+                    new SecondThread().start();
+                    break;
+                case 'y':
+                    ownedKeys.put("y", true);
+                    new SecondThread().start();
+                    break;
+            }
 
-                break;
-            case "g":
-                ownedKeys.put("g", true);
-                new SecondThread().start();
-
-                break;
-            case "y":
-                ownedKeys.put("y", true);
-                new SecondThread().start();
-
-                break;
+        } catch (Exception e) {
         }
     }
 
@@ -177,17 +184,11 @@ public class Main extends Base {
                     bestHouse.setAction(Action.NoOp);
                 }
             }
+            System.out.println(bestHouse.getAction() + " to: " + bestHouse.getI() + " : " + bestHouse.getJ() + " \n Score: " + bestHouse.score);
         } catch (Exception ex) {
         }
 
         try {
-            System.out.println(bestHouse.getAction() + " to: " + bestHouse.getI() + " : " + bestHouse.getJ() + " \n Score: " + bestHouse.score);
-            if (bestHouse.getScore() == maxScoreOfGrid * 5) {
-                System.out.println("*************GOT THE DIAMOND\n");
-                chosenDiamond = null;
-                new SecondThread().start();
-            }
-
             if (map[bestHouse.getI()][bestHouse.getJ()] != "W") {
                 return bestHouse.getAction();
             } else {
@@ -203,14 +204,14 @@ public class Main extends Base {
     }
 
     public Boolean detectWall(int i, int j) {
-        if (map[i][j].equals("W")) {
+        if (map[i][j].charAt(0) == 'W') {
             return true;
         }
         return false;
     }
 
     public Boolean detectWire(int i, int j) {
-        if (map[i][j].equals("*")) {
+        if (map[i][j].charAt(0) == '*') {
             return true;
         }
         return false;
@@ -303,7 +304,7 @@ public class Main extends Base {
                             chosenDiamond.setJ(j);
                             chosenDiamond.setValue(map[i][j]);
                             Long distance = getDistance(currentPositionI, currentPositionJ, chosenDiamond.getI(), chosenDiamond.getJ()) + 4;
-                            System.out.println("\n++++++++Found new diamond  at:" + i + " : " + j);
+                            System.out.println("++++++++Found new diamond  at:" + i + " : " + j);
 //                            System.out.println("Distance : " + distance);
 
                             scoredGrid = new int[getGridHeight()][getGridWidth()];
