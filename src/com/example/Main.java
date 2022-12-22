@@ -238,19 +238,19 @@ public class Main extends Base {
                         scoredGrid[a][b] = (maxScoreOfGrid) / 100;
                     } else if (detectTeleport(a, b)) {
                         scoredGrid[a][b] = (maxScoreOfGrid) / 10;
-                    } else if (map[i][j].equals("R")) {
+                    } else if (map[a][b].charAt(0) == 'R') {
                         if (ownedKeys.get("r")) {
                             scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
-                    } else if (map[i][j].equals("Y")) {
+                    } else if (map[b][b].charAt(0) == 'Y') {
                         if (ownedKeys.get("y")) {
                             scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
                             scoredGrid[a][b] = -(maxScoreOfGrid);
                         }
-                    } else if (map[i][j].equals("G")) {
+                    } else if (map[b][b].charAt(0) == 'G') {
                         if (ownedKeys.get("g")) {
                             scoredGrid[a][b] = (maxScoreOfGrid / distance) - a - b;
                         } else {
@@ -274,8 +274,8 @@ public class Main extends Base {
                     if (map[i][j].substring(1).equals("A")) {
                         currentPositionI = i;
                         currentPositionJ = j;
+                        scoredGrid[currentPositionI][currentPositionJ] = scoredGrid[currentPositionI][currentPositionJ] / 4;
                         System.out.println("---- We are at:" + currentPositionI + " : " + currentPositionJ);
-
                         return;
                     }
                 }
