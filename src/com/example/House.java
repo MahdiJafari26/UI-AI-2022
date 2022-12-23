@@ -1,12 +1,12 @@
 package com.example;
 
 public class House {
-    Integer i = 0;
-    Integer j = 0;
-    Integer score = 0;
-    String value;
-
-    Integer passedTurnsToFollow = 0;
+    private Integer i = 0;
+    private Integer j = 0;
+    private Integer score = 0;
+    private String value;
+    private Long expectedValue;
+    private Integer passedTurnsToFollow = 0;
 
     public Integer getPassedTurnsToFollow() {
         return passedTurnsToFollow;
@@ -56,5 +56,13 @@ public class House {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Long getExpectedValue() {
+        return expectedValue;
+    }
+
+    public void setExpectedValue(Long expectedValue) {
+        this.expectedValue = expectedValue;
     }
 }

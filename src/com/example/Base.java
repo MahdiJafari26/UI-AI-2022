@@ -23,7 +23,7 @@ public abstract class Base {
     private char character;
     private int[] agentScores;
     private String[][] grid;
-    private LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>> probabilities;
+    private LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Double>>> probabilities;
 
     public static String DEFAULT_SERVER_IP = "127.0.0.1";
     public static int DEFAULT_SERVER_PORT = 9921;
@@ -72,11 +72,11 @@ public abstract class Base {
         return grid;
     }
 
-    public LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>> getProbabilities() {
+    public LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Double>>> getProbabilities() {
         return probabilities;
     }
 
-    public void setProbabilities(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>> probabilities) {
+    public void setProbabilities(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Double>>> probabilities) {
         this.probabilities = probabilities;
     }
 
@@ -100,7 +100,6 @@ public abstract class Base {
             connect();
             String data = this.bufferedReader.readLine();
             Map<String, Object> result = new ObjectMapper().readValue(data, HashMap.class);
-            System.out.println(result);
 
             this.gridHeight = (Integer) result.get("height");
             this.gridWidth = (Integer) result.get("width");
@@ -110,7 +109,7 @@ public abstract class Base {
             this.maxTurnCount = (Integer) result.get("max_turn_count");
             this.agentCount = (Integer) result.get("agent_count");
             this.agentScores = new int[agentCount];
-            this.probabilities = (LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Float>>>) result.get("probabilities");
+            this.probabilities = (LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Double>>>) result.get("probabilities");
             this.printWriter.println("CONFIRM");
 
         } catch (IOException e) {
